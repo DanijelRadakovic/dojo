@@ -1,0 +1,35 @@
+CHART NAME: {{ .Chart.Name }}
+CHART VERSION: {{ .Chart.Version }}
+APP VERSION: {{ .Chart.AppVersion }}
+
+{{- if .Values.diagnosticMode.enabled }}
+The chart has been deployed in diagnostic mode. All probes have been disabled and the command has been overwritten with:
+
+  command: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.command "context" $) | nindent 4 }}
+  args: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.args "context" $) | nindent 4 }}
+{{- end }}
+
+1. Get the application URL by running these commands:
+
+{{- if .Values.ingress.enabled }}
+    {{ ternary "https" "http" .Values.ingress.tls }}://{{ .Values.ingress.hostname }}{{ .Values.ingress.path }}
+{{- else if contains "NodePort" .Values.service.type }}
+    export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "common.names.fullname" . }})
+    export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+    echo http://$NODE_IP:$NODE_PORT
+{{- else if contains "LoadBalancer" .Values.service.type }}
+     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+           You can watch the status of by running 'kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "common.names.fullname" . }}'
+    export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "common.names.fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+    echo http://$SERVICE_IP:{{ .Values.service.ports.grafana }}
+{{- else if contains "ClusterIP" .Values.service.type }}
+    echo "Browse to http://127.0.0.1:8080"
+    kubectl port-forward svc/{{ include "common.names.fullname" . }} 8080:{{ .Values.service.ports.grafana }} &
+{{- end }}
+
+
+{{- include "common.warnings.rollingTag" .Values.image }}
+{{ include "dojo.validateValues" . }}
+{{- include "common.warnings.resources" (dict "sections" (list "") "context" $) }}
+{{- include "common.warnings.modifiedImages" (dict "images" (list .Values.image) "context" $) }}
+{{- include "common.errors.insecureImages" (dict "images" (list .Values.image) "context" $) }}
