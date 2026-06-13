@@ -106,6 +106,9 @@ enableDefaultInitContainers: true
 ## @param automountServiceAccountToken Mount Service Account token in pod
 ##
 automountServiceAccountToken: false
+## @param workingDir Working directory for Dojo application
+##
+workingDir: ""
 ## @param hostAliases Deployment pod host aliases
 ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
 ##
