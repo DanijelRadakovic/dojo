@@ -2,7 +2,7 @@ apiVersion: v2
 name: dojo
 description: A Helm chart for Dojo application
 type: application
-version: 1.0.1
+version: 1.0.2
 appVersion: "0.1.0"
 dependencies:
   - name: common

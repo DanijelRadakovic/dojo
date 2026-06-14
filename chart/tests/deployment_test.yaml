@@ -1,0 +1,18 @@
+suite: test deployment
+templates:
+  - deployment.yaml
+tests:
+  - it: should render workingDir when provided
+    set:
+      workingDir: "/tmp"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].workingDir
+          value: "/tmp"
+
+  - it: should NOT render workingDir when omitted
+    set:
+      workingDir: ""
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].workingDir
